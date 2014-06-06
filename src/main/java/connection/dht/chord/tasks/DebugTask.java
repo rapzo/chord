@@ -2,12 +2,10 @@ package connection.dht.chord.tasks;
 
 import connection.dht.chord.Node;
 
-public class DebugTask implements Runnable {
+public class DebugTask extends Task {
 	
-	private Node node;
-	
-	public DebugTask(Node n) {
-		node = n;
+	public DebugTask(Node node) {
+		super(node);
 	}
 
 	public void run() {

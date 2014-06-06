@@ -7,17 +7,15 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import connection.dht.chord.Chord;
 import connection.dht.chord.Node;
+import connection.dht.chord.tasks.Task;
 
-public class ChordChannel implements Runnable {
 
-	private Node node;
-	
+public class ChordChannel extends Task {
 	ArrayBlockingQueue<String> queue;
 	
 	public ChordChannel(Node node, ArrayBlockingQueue<String> queue) {
-		this.node = node;
+		super(node);
 		this.queue = queue;
 	}
 

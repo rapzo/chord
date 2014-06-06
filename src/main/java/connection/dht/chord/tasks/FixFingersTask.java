@@ -2,12 +2,10 @@ package connection.dht.chord.tasks;
 
 import connection.dht.chord.Node;
 
-public class FixFingersTask implements Runnable {
+public class FixFingersTask extends Task {
 	
-	private Node node;
-
-	public FixFingersTask(Node n) {
-		node = n;
+	public FixFingersTask(Node node) {
+		super(node);
 	}
 
 	public void run() {

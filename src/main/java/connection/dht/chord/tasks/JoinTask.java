@@ -13,23 +13,38 @@ public class JoinTask implements Callable<Node> {
 	
 	private Node node;
 	private Node destiny;
+	private String username;
+	private String password;
 
 	public JoinTask(Node node, Node destiny) {
 		this.node = node;
 		this.destiny = destiny;
 	}
+	
+	public JoinTask(Node node, Node destiny, String username, String password) {
+		this(node, destiny);
+		this.username = username;
+		this.password = password;
+	}
 
-	public void run() {
+	public Node call() throws Exception {
 		DatagramSocket s;
 		StringBuilder message = new StringBuilder();
 		
 		try {
 			s = new DatagramSocket();
 			message
-				.append("REQUEST ")
-				.append("JOIN ")
-				.append(node.id())
-				.append(" ")
+				.append("QUERY")
+				.append("JOIN")
+				.append(" ");
+			
+			if (this.username != null && this.password != null) {
+				message
+					.append(this.username)
+					.append(this.password);
+			}
+			
+			message
 				.append(node.host())
 				.append(" ")
 				.append(node.port())
@@ -45,6 +60,7 @@ public class JoinTask implements Callable<Node> {
 				InetAddress.getByName(destiny.host()),
 				destiny.port()
 			);
+			
 			s.send(msg);
 			
 			System.out.print(message);
@@ -55,10 +71,7 @@ public class JoinTask implements Callable<Node> {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public Node call() throws Exception {
-		this.run();
+		
 		return node;
 	}
 

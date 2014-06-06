@@ -8,15 +8,13 @@ import java.net.SocketException;
 
 import connection.dht.chord.Node;
 
-public class NotifyTask implements Runnable {
-	
-	private Node destiny;
+public class NotifyTask extends Task {
 	
 	private String query;
 	
 	
-	public NotifyTask(Node d, String q) {
-		this.destiny = d;
+	public NotifyTask(Node node, String q) {
+		super(node);
 		this.query = q;
 	}
 
@@ -29,11 +27,11 @@ public class NotifyTask implements Runnable {
 			DatagramPacket packet = new DatagramPacket(
 				query.toString().getBytes(),
 				query.toString().getBytes().length,
-				InetAddress.getByName(destiny.host()),
-				destiny.port()
+				InetAddress.getByName(node.host()),
+				node.port()
 			);
 			
-			System.out.println("Sending message to "+ destiny.host() + ":" + destiny.port());
+			System.out.println("Sending message to "+ node.host() + ":" + node.port());
 			s.send(packet);
 			System.out.println("Sent!");
 

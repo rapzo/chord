@@ -3,12 +3,10 @@ package connection.dht.chord.tasks;
 import connection.dht.chord.Chord;
 import connection.dht.chord.Node;
 
-public class StabilizeTask implements Runnable {
-	
-	private Node node;
+public class StabilizeTask extends Task {
 
-	public StabilizeTask(Node n) {
-		node = n;
+	public StabilizeTask(Node node) {
+		super(node);
 	}
 
 	public void run() {

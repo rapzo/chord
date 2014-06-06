@@ -17,6 +17,7 @@ import connection.dht.chord.tasks.DebugTask;
 import connection.dht.chord.tasks.FixFingersTask;
 import connection.dht.chord.tasks.NotifyTask;
 import connection.dht.chord.tasks.StabilizeTask;
+import connection.dht.chord.tasks.Task;
 
 
 public class Chord {
@@ -45,24 +46,23 @@ public class Chord {
 	
 	HashMap<String, Runnable> channels;
 	
-	HashMap<String, Runnable> tasks;
+	HashMap<String, Runnable> schedule;
 	
 	// HashMap<String, Callable<Node>> tasks;
 	
 	
 	ArrayBlockingQueue<String> messages;
 	
+	ArrayBlockingQueue<Task> jobs;
+	
 	
 	/****** Singleton initialization ******/
-	
-	private Chord(int id, String host, int port) {
+	private Chord(String host, int port) {
 		this.host = host;
 		this.port = port;
 		
 		this.virtual = false;
 		this.proxy = false;
-		
-		// node = new Node(new Key(id, host), host, port);
 
 		nodes = new HashMap<Key, Node>();
 		
@@ -70,21 +70,29 @@ public class Chord {
 		
 		messages = new ArrayBlockingQueue<String>(10, true);
 		
+		jobs = new ArrayBlockingQueue<Task>(10, true);
+		
 		channels = new HashMap<String, Runnable>();		
 		
-		tasks = new HashMap<String, Runnable>();
+		schedule = new HashMap<String, Runnable>();
 		
 		// tasks = new HashMap<String, Callable<Node>>();
 	}
 	
+	private Chord(Node n) {
+		this(n.host(), n.port());
+		
+		node = n;
+	}
+	
 	public static void create(String host, int port, boolean spawns) {
-		chord = new Chord(0, host, port);
+		chord = new Chord(new Node(new Key(0, host), host, port));
 		
 		chord.start();
 	}
 	
 	public static void join(String host, int port, String saddr, int sport) {
-		chord = new Chord(generate_id(), host, port);
+		chord = new Chord(new Node(host, port));
 		
 		chord.start();
 		
@@ -126,14 +134,14 @@ public class Chord {
 	}
 	
 	private void start_tasks() {
-		tasks.put("fix_fingers", new FixFingersTask(node));
-		tasks.put("stabilize", new StabilizeTask(node));
-		tasks.put("debug", new DebugTask(node));
+		schedule.put("fix_fingers", new FixFingersTask(node));
+		schedule.put("stabilize", new StabilizeTask(node));
+		schedule.put("debug", new DebugTask(node));
 		
 		operator = Executors.newScheduledThreadPool(1);
 		
-		operator.scheduleAtFixedRate(tasks.get("stabilize"), 0, 4, TimeUnit.SECONDS);
-		operator.scheduleAtFixedRate(tasks.get("debug"), 0, 5, TimeUnit.SECONDS);
+		operator.scheduleAtFixedRate(schedule.get("stabilize"), 0, 4, TimeUnit.SECONDS);
+		operator.scheduleAtFixedRate(schedule.get("debug"), 0, 5, TimeUnit.SECONDS);
 	}
 	
 	
